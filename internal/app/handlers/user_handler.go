@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -41,7 +40,7 @@ func (u *UserHandlerImpl) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.RespondWithJSON(w, 200, map[string]string{"message": fmt.Sprintf("Category created successfully")})
+	utils.RespondWithJSON(w, 200, map[string]string{"message": "Category created successfully"})
 }
 
 func (u *UserHandlerImpl) UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +56,7 @@ func (u *UserHandlerImpl) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
-	utils.RespondWithJSON(w, 200, map[string]string{"message": fmt.Sprintf("Category created successfully")})
+	utils.RespondWithJSON(w, 200, map[string]string{"message": "Category created successfully"})
 }
 
 func (u *UserHandlerImpl) DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +66,7 @@ func (u *UserHandlerImpl) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
-	utils.RespondWithJSON(w, 200, map[string]string{"message": fmt.Sprintf("Category created successfully")})
+	utils.RespondWithJSON(w, 200, map[string]string{"message": "Category created successfully"})
 }
 
 func (u *UserHandlerImpl) GetUser(w http.ResponseWriter, r *http.Request) {

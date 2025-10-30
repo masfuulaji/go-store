@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/masfuulaji/store/config"
@@ -16,6 +17,8 @@ func main() {
 		fmt.Println("config error")
 	}
 	r := chi.NewRouter()
+
+	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"},
 		AllowedOrigins: []string{"https://*", "http://*"},

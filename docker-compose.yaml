@@ -4,10 +4,14 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: go-store
+    command: go run cmd/main.go
+    develop:
+      watch:
+        - action: sync+restart
+          path: .
+          target: /app
     ports:
       - 3000:3000
-    volumes:
-      - .:/app
     depends_on:
       - db
     networks:

@@ -26,8 +26,8 @@ func NewLoginHandler(db *sqlx.DB) *LoginHandlerImpl {
 }
 
 type Claims struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
+	Id    int    `json:"id"`
+	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
@@ -38,7 +38,7 @@ func (u *LoginHandlerImpl) Login(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithJSON(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	res, err := u.userRepository.GetUserByUsername(user.Username)
+	res, err := u.userRepository.GetUserByEmail(user.Email)
 	if err != nil {
 		utils.RespondWithJSON(w, http.StatusBadRequest, err.Error())
 		return
@@ -51,8 +51,8 @@ func (u *LoginHandlerImpl) Login(w http.ResponseWriter, r *http.Request) {
 
 	expirationTime := time.Now().Add(10 * time.Hour)
 	claim := &Claims{
-		Id:       res.Id,
-		Username: res.Username,
+		Id:    res.Id,
+		Email: res.Email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},

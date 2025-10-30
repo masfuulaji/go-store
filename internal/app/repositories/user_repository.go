@@ -15,7 +15,7 @@ type UserRepository interface {
 	GetUsers() ([]models.User, error)
 	UpdateUser(user models.User, id string) error
 	DeleteUser(id string) error
-	GetUserByUsername(username string) (models.User, error)
+	GetUserByEmail(email string) (models.User, error)
 }
 
 type UserRepositoryImpl struct {
@@ -27,10 +27,10 @@ func NewUserRepository(db *sqlx.DB) *UserRepositoryImpl {
 }
 
 func (u *UserRepositoryImpl) CreateUser(user models.User) error {
-	query := "INSERT INTO users (username, email, password, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)"
+	query := "INSERT INTO users (first_name, last_name, email, password, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6)"
 	createdAt := time.Now().Format("2006-01-02 15:04:05")
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	_, err := u.db.Exec(query, user.Username, user.Email, user.Password, createdAt, updatedAt)
+	_, err := u.db.Exec(query, user.FirstName, user.LastName, user.Email, user.Password, createdAt, updatedAt)
 	if err != nil {
 		return err
 	}
@@ -56,9 +56,9 @@ func (u *UserRepositoryImpl) GetUsers() ([]models.User, error) {
 	return users, nil
 }
 
-func (u *UserRepositoryImpl) GetUserByUsername(username string) (models.User, error) {
-	query := "SELECT * FROM users WHERE username = $1 AND deleted_at IS NULL"
-	err := u.db.Get(&user, query, username)
+func (u *UserRepositoryImpl) GetUserByEmail(email string) (models.User, error) {
+	query := "SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL"
+	err := u.db.Get(&user, query, email)
 	if err != nil {
 		return user, err
 	}
@@ -66,9 +66,9 @@ func (u *UserRepositoryImpl) GetUserByUsername(username string) (models.User, er
 }
 
 func (u *UserRepositoryImpl) UpdateUser(user models.User, id string) error {
-	query := "UPDATE users SET username = $1, email = $2, password = $3, updated_at = $4 WHERE id = $5"
+	query := "UPDATE users SET first_name = $1, last_name = $2, email = $3, password = $4, updated_at = $5 WHERE id = $6"
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	_, err := u.db.Exec(query, user.Username, user.Email, user.Password, updatedAt, id)
+	_, err := u.db.Exec(query, user.FirstName, user.LastName, user.Email, user.Password, updatedAt, id)
 	if err != nil {
 		return err
 	}

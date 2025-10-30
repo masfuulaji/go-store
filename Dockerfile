@@ -1,18 +1,23 @@
-# Use the official Golang image as the base
 FROM golang:1.25-alpine
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Install Air for hot reloading
-RUN go install github.com/air-verse/air@latest
-
-# Copy the Go module files and download dependencies
 COPY go.mod go.sum ./
+RUN go mod tidy
+RUN go mod verify
 RUN go mod download
 
-# Copy the source code to the container
 COPY . .
 
-# Run the Go app
-CMD ["air","-c",".air.toml"]
+# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main ./cmd
+
+# FROM alpine:3.19
+
+# WORKDIR /app
+
+# COPY --from=builder /app .
+
+# RUN chmod +x /app/main
+# EXPOSE 3000
+
+# CMD ["go run app/cmd/main.go"]
