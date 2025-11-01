@@ -20,6 +20,7 @@ func SetupRoutes(r *chi.Mux) {
 
 	userHandler := handlers.NewUserHandler(db.DB)
 	r.Route("/user", func(r chi.Router) {
+		r.Use(AuthMiddleware)
 		r.Get("/", userHandler.GetUsers)
 		r.Get("/{id}", userHandler.GetUser)
 		r.Post("/", userHandler.CreateUser)
@@ -31,5 +32,13 @@ func SetupRoutes(r *chi.Mux) {
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/", loginHandler.Login)
 		r.Get("/logout", loginHandler.Logout)
+	})
+
+	fileServer := http.StripPrefix("/images/", http.FileServer(http.Dir("./images")))
+	r.Handle("/images/*", fileServer)
+
+	bannerHandler := handlers.NewBannerHandler(db.DB)
+	r.Route("/banner", func(r chi.Router) {
+		r.Get("/", bannerHandler.GetBanners)
 	})
 }
