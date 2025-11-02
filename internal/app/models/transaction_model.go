@@ -11,8 +11,9 @@ type Transaction struct {
 	UpdatedAt       time.Time   `db:"updated_at" json:"updated_at"`
 	DeletedAt       pq.NullTime `db:"deleted_at" json:"deleted_at"`
 	InvoiceNumber   string      `db:"invoice_number" json:"invoice_number"`
+	TransactionCode string      `db:"transaction_code" json:"transaction_code"`
 	TransactionType string      `db:"transaction_type" json:"transaction_type"`
 	TotalAmount     float64     `db:"total_amount" json:"total_amount"`
-	UserId          string      `db:"user_id" json:"user_id"`
+	UserId          int         `db:"user_id" json:"user_id"`
 	Id              int         `json:"id"`
 }

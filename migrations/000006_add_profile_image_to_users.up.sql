@@ -1,2 +1,2 @@
 ALTER TABLE users
-DROP COLUMN IF EXISTS profile_image;
+ADD COLUMN profile_image VARCHAR(500);

@@ -11,10 +11,10 @@ import (
 
 type UserRepository interface {
 	CreateUser(user models.User) error
-	GetUser(id string) (models.User, error)
+	GetUser(id int) (models.User, error)
 	GetUsers() ([]models.User, error)
-	UpdateUser(user models.User, id string) error
-	UpdateUserProfile(profile string, id string) error
+	UpdateUser(user models.User, id int) (models.User, error)
+	UpdateUserProfile(profile string, id int) (models.User, error)
 	DeleteUser(id string) error
 	GetUserByEmail(email string) (models.User, error)
 }
@@ -28,17 +28,17 @@ func NewUserRepository(db *sqlx.DB) UserRepository {
 }
 
 func (u UserRepositoryImpl) CreateUser(user models.User) error {
-	query := "INSERT INTO users (first_name, last_name, email, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)"
+	query := "INSERT INTO users (first_name, last_name, email, password, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6)"
 	createdAt := time.Now().Format("2006-01-02 15:04:05")
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	_, err := u.db.Exec(query, user.FirstName, user.LastName, user.Email, createdAt, updatedAt)
+	_, err := u.db.Exec(query, user.FirstName, user.LastName, user.Email, user.Password, createdAt, updatedAt)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u UserRepositoryImpl) GetUser(id string) (models.User, error) {
+func (u UserRepositoryImpl) GetUser(id int) (models.User, error) {
 	var user models.User
 	query := "SELECT * FROM users WHERE id = $1 AND deleted_at IS NULL"
 	err := u.db.Get(&user, query, id)
@@ -68,24 +68,46 @@ func (u UserRepositoryImpl) GetUserByEmail(email string) (models.User, error) {
 	return user, nil
 }
 
-func (u UserRepositoryImpl) UpdateUser(user models.User, id string) error {
-	query := "UPDATE users SET first_name = $1, last_name = $2, updated_at = $4 WHERE id = $5"
+func (u UserRepositoryImpl) UpdateUser(user models.User, id int) (models.User, error) {
+	query := `UPDATE users SET first_name = $1, last_name = $2, updated_at = $3 WHERE id = $4 
+			RETURNING id, first_name, last_name, email, profile_image, created_at, updated_at`
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	_, err := u.db.Exec(query, user.FirstName, user.LastName, user.Password, updatedAt, id)
+	var updatedUser models.User
+	err := u.db.QueryRow(query, user.FirstName, user.LastName, updatedAt, id).Scan(
+		&updatedUser.Id,
+		&updatedUser.FirstName,
+		&updatedUser.LastName,
+		&updatedUser.Email,
+		&updatedUser.ProfileImage,
+		&updatedUser.CreatedAt,
+		&updatedUser.UpdatedAt,
+	)
 	if err != nil {
-		return err
+		return models.User{}, err
 	}
-	return nil
+
+	return updatedUser, nil
 }
 
-func (u UserRepositoryImpl) UpdateUserProfile(profile string, id string) error {
-	query := "UPDATE users SET profile_image = $1, updated_at = $2 WHERE id = $3"
+func (u UserRepositoryImpl) UpdateUserProfile(profile string, id int) (models.User, error) {
+	query := `UPDATE users SET profile_image = $1, updated_at = $2 WHERE id = $3
+	RETURNING id, first_name, last_name, email, profile_image, created_at, updated_at`
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	_, err := u.db.Exec(query, profile, updatedAt, id)
+	var updatedUser models.User
+	err := u.db.QueryRow(query, profile, updatedAt, id).Scan(
+		&updatedUser.Id,
+		&updatedUser.FirstName,
+		&updatedUser.LastName,
+		&updatedUser.Email,
+		&updatedUser.ProfileImage,
+		&updatedUser.CreatedAt,
+		&updatedUser.UpdatedAt,
+	)
 	if err != nil {
-		return err
+		return models.User{}, err
 	}
-	return nil
+
+	return updatedUser, nil
 }
 
 func (u UserRepositoryImpl) DeleteUser(id string) error {

@@ -48,10 +48,6 @@ func (u *LoginHandlerImpl) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if user.Password != res.Password {
-	// 	utils.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"message": "Invalid credentials"})
-	// 	return
-	// }
 	err = bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(user.Password))
 	if err != nil {
 		utils.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"message": "Invalid credentials"})
@@ -86,7 +82,17 @@ func (u *LoginHandlerImpl) Login(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "Login successful"})
+	type TokenResponse struct {
+		Token string `json:"token"`
+	}
+	tokenResponse := TokenResponse{
+		Token: tokenString,
+	}
+	utils.RespondWithJSON(w, http.StatusOK, map[string]interface{}{
+		"status":  0,
+		"message": "Login Sukses",
+		"data":    tokenResponse,
+	})
 }
 
 func (u *LoginHandlerImpl) Logout(w http.ResponseWriter, r *http.Request) {
@@ -97,7 +103,11 @@ func (u *LoginHandlerImpl) Logout(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		SameSite: http.SameSiteLaxMode,
 	})
-	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "Logout successful"})
+	utils.RespondWithJSON(w, http.StatusOK, map[string]interface{}{
+		"status":  0,
+		"message": "Logout Sukses",
+		"data":    nil,
+	})
 }
 
 func (u *LoginHandlerImpl) IsLogin(w http.ResponseWriter, r *http.Request) {
